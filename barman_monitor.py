@@ -7,11 +7,6 @@ now = datetime.datetime.now().date()
 nowformat = now.strftime("%Y%m%d")
 directory = "/storage/barman-backup/"
 
-#html_content = f"<html> <head> </head> <body> </body> </html>"
-#with open(f'raport{nowformat}.html', 'w') as f:
-#    f.write(html_content)
-#f.close()
-
 #Tworzymy, otwieramy i dodajemy datę do plik raportowego, a następnie zamykamy go
 with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('<h1>RAPORT BARMAN 3S WARSZAWA</h1>')
