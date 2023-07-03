@@ -1,23 +1,24 @@
 #Importujemy potrzebne moduły
-import os, sys, datetime
+import os, sys, datetime, shutil, subprocess
 from airium import Airium
 
 #Pobieramy dzisiejszą datę bez godziny i modyfikujemy jej format z YY-MM-DD na YYMMDD
 now = datetime.datetime.now().date()
 nowformat = now.strftime("%Y%m%d")
 directory = "/storage/barman-backup/"
+archive = "/var/barman_archive/"
 
 def hashline():
     with open(f'raport{nowformat}.txt', 'a') as f:
         f.write('<span style="font-size: 1.3em">')
-        f.write('########################################' '</br>')
+        f.write('#################################################' '</br>')
         f.write('</span>')
     f.close()
 
 #Tworzymy, otwieramy i dodajemy datę do plik raportowego, a następnie zamykamy go
 with open(f'raport{nowformat}.txt', 'a') as f:
-    f.write('<body style="background-color: #d7d9db;" style="text-alignt: center" style="padding: 2%" style="margin: 0">')
-    f.write('<h1>RAPORT BARMAN 3S WARSZAWA</h1>')
+    f.write('<body style="background-color: #d7d9db; text-alignt: center" style="padding: 2%" style="margin: 0">')
+    f.write('<h1>RAPORT BARMAN DATASPACE WARSZAWA</h1>')
     f.write(f'<h2>DATA: {now} </h2>')
 f.close()
 
@@ -54,6 +55,7 @@ with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('<h3>Stan konfiguracji:</h3>')
 f.close()
 
+repair = 0
 successbck = []
 failedbck = []
 
@@ -67,6 +69,14 @@ for i in backups:
 with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('<h4>Poprawny:</h4>')
 f.close()
+
+#Próba naprawienia konfigu w stanie FAILED
+for x in failedbck:
+    os.system(f'rm -rf {directory}{x}/errors/* > /dev/null 2>&1')
+    os.system(f'barman receive-wal {x} --stop > /dev/null 2>&1')
+    os.system(f'barman receive-wal {x} --reset > /dev/null 2>&1')
+    os.system (f'barman switch-xlog --force --archive {x} > /dev/null 2>&1')
+    repair = 1
 
 #Formatowanie zmiennych dla HTML
 successbck = str(successbck)
@@ -96,6 +106,14 @@ with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('</p>')
 f.close()
 
+if repair == 1:
+    with open(f'raport{nowformat}.txt', 'a') as f:
+        f.write('<p style="font-weight: bold">')
+        f.write('!Podjęto próbę automatycznej naprawy konfiguracji! </br>')
+        f.write('</p>')
+    f.close()
+
+
 #Wypisujemy wykonane dziś kopie dla każdej konfiguracji
 hashline()
 
@@ -105,14 +123,14 @@ for i in backups:
         f.write('</br>' f'Wykonane dziś kopie dla konfiguracji {i}:' '</br>')
         f.write('</span>')
     f.close()
-    test = None
+    exist = None
     for file in os.listdir(directory+i+"/base"):
         if file.startswith(nowformat):
             with open(f'raport{nowformat}.txt', 'a') as f:
                 f.write(f'{file}' '</br>')
             f.close()
-            test = i
-    if test == None:
+            exist = i
+    if exist == None:
         with open(f'raport{nowformat}.txt', 'a') as f:
             f.write('<span style="color: #b30000">')
             f.write(f'BRAK KOPII' '</br>')
@@ -125,7 +143,6 @@ with open(f'raport{nowformat}.txt', 'a') as f:
 f.close()
 
 hashline()
-
 runclear = int(0)
 for i in backups:
     with open(f'raport{nowformat}.txt', 'a') as f:
@@ -133,10 +150,11 @@ for i in backups:
         f.write('</br>' f'Stan wykonanych dziś kopii dla {i}:' '</br>')
         f.write('</span>')
     f.close()
-
+    existv2 = None
     for file in os.listdir(directory+i+"/base"):
         if file.startswith(nowformat):
             backupstate = os.system(f'barman check-backup {i} {file} >/dev/null 2>&1')
+            existv2 = i
             if backupstate == 0:
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('<span style="color: #248f24">')
@@ -154,6 +172,13 @@ for i in backups:
                     f.write('</span>')
                 f.close()
                 runclear = int(1)
+    if existv2 == None:
+        with open(f'raport{nowformat}.txt', 'a') as f:
+            f.write('<span style="color: #b54a55">')
+            f.write(f'BRAK KOPII' '</br>')
+            f.write('</span>')
+        f.close()
+
 
 #Uruchomienie skryptu do czyszczenia w przypadku wykrycia uszkodzonych kopii
 with open(f'raport{nowformat}.txt', 'a') as f:
@@ -196,5 +221,5 @@ with open(f'raport{nowformat}.html', 'wb') as f:
 
 #Przesłanie raportu mailem
 os.system(f'echo "W załączniku raport za dzień {now}" | mail -s "Automatyczny Raport Barman" damian.golal@dataspace.pl -A raport{nowformat}.html')
-os.remove(f'raport{nowformat}.html')
+shutil.move(f'raport{nowformat}.html', archive)
 os.remove(f'raport{nowformat}.txt')
