@@ -27,32 +27,34 @@ configs = os.listdir("/etc/barman.d/")
 configs.remove('streaming-server.conf-template')
 configs.remove('ssh-server.conf-template')
 configs.remove('passive-server.conf-template')
+configs.sort(reverse=True)
 
 #Wypisujemy dostępne konfiguracje
-hashline()
+#hashline()
 
-with open(f'raport{nowformat}.txt', 'a') as f:
-    f.write('<h3>' 'Konfiguracje dostępne na serwerze:' '</h3>')
-f.close()
+#with open(f'raport{nowformat}.txt', 'a') as f:
+#    f.write('<h3>' 'Konfiguracje dostępne na serwerze:' '</h3>')
+#f.close()
 
-for i in configs:
-    with open(f'raport{nowformat}.txt', 'a') as f:
-        f.write(f'{i}' '</br>')
-f.close()
-
-with open(f'raport{nowformat}.txt', 'a') as f:
-        f.write('</br>')
-f.close()
+#for i in configs:
+#    with open(f'raport{nowformat}.txt', 'a') as f:
+#        f.write(f'{i}' '</br>')
+#f.close()
+#
+#with open(f'raport{nowformat}.txt', 'a') as f:
+#        f.write('</br>')
+#f.close()
 
 
 hashline()
 
 #Tworzymy nową listę na bazie konfiguracji i usuwamy ostatnie 5 znaków z każdej pozycji (.conf)
 backups = [i[:-5] for i in configs]
+backups.sort(reverse=True)
 
 #Sprawdzamy stan każdego konfigu i wypisujemy go
 with open(f'raport{nowformat}.txt', 'a') as f:
-    f.write('<h3>Stan konfiguracji:</h3>')
+    f.write('<h3>Konfiguracje dostępne na serwerze:</h3>')
 f.close()
 
 repair = 0
@@ -65,6 +67,9 @@ for i in backups:
         successbck.append(i)
     else:
         failedbck.append(i)
+
+successbck.sort(reverse=True)
+failedbck.sort(reverse=True)
 
 with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('<h4>Poprawny:</h4>')
@@ -115,46 +120,48 @@ if repair == 1:
 
 
 #Wypisujemy wykonane dziś kopie dla każdej konfiguracji
-hashline()
+#hashline()
 
-for i in backups:
-    with open(f'raport{nowformat}.txt', 'a') as f:
-        f.write('<span style="font-weight: bold">')
-        f.write('</br>' f'Wykonane dziś kopie dla konfiguracji {i}:' '</br>')
-        f.write('</span>')
-    f.close()
-    exist = None
-    for file in os.listdir(directory+i+"/base"):
-        if file.startswith(nowformat):
-            with open(f'raport{nowformat}.txt', 'a') as f:
-                f.write(f'{file}' '</br>')
-            f.close()
-            exist = i
-    if exist == None:
-        with open(f'raport{nowformat}.txt', 'a') as f:
-            f.write('<span style="color: #b30000">')
-            f.write(f'BRAK KOPII' '</br>')
-            f.write('</span>')
-        f.close()
+#for i in backups:
+#    with open(f'raport{nowformat}.txt', 'a') as f:
+#        f.write('<span style="font-weight: bold">')
+#        f.write('</br>' f'Wykonane dziś kopie dla konfiguracji {i}:' '</br>')
+#        f.write('</span>')
+#    f.close()
+#    exist = None
+#    for file in sorted(os.listdir(directory+i+"/base")):
+#        if file.startswith(nowformat):
+#            with open(f'raport{nowformat}.txt', 'a') as f:
+#                f.write(f'{file}' '</br>')
+#            f.close()
+#            exist = i
+#    if exist == None:
+#        with open(f'raport{nowformat}.txt', 'a') as f:
+#            f.write('<span style="color: #b30000">')
+#            f.write(f'BRAK KOPII' '</br>')
+#            f.write('</span>')
+#        f.close()
 
 #Sprawdzamy wykonane dziś kopie i wypisujemy stan każdej z nich
-with open(f'raport{nowformat}.txt', 'a') as f:
-    f.write('</br>')
-f.close()
+#with open(f'raport{nowformat}.txt', 'a') as f:
+#    f.write('</br>')
+#f.close()
 
 hashline()
 runclear = int(0)
+toclear = []
+
 for i in backups:
     with open(f'raport{nowformat}.txt', 'a') as f:
         f.write('<span style="font-weight: bold">')
         f.write('</br>' f'Stan wykonanych dziś kopii dla {i}:' '</br>')
         f.write('</span>')
     f.close()
-    existv2 = None
-    for file in os.listdir(directory+i+"/base"):
+    exist = None
+    for file in sorted(os.listdir(directory+i+"/base")):
         if file.startswith(nowformat):
             backupstate = os.system(f'barman check-backup {i} {file} >/dev/null 2>&1')
-            existv2 = i
+            exist = i
             if backupstate == 0:
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('<span style="color: #248f24">')
@@ -171,8 +178,9 @@ for i in backups:
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('</span>')
                 f.close()
+                toclear.append(i)
                 runclear = int(1)
-    if existv2 == None:
+    if exist == None:
         with open(f'raport{nowformat}.txt', 'a') as f:
             f.write('<span style="color: #b54a55">')
             f.write(f'BRAK KOPII' '</br>')
@@ -188,7 +196,8 @@ f.close()
 hashline()
 
 if runclear == 1:
-    os.system( "./barman_clear.sh")
+    for x in toclear:
+        os.system(f'./barman_clear.sh -n {x}')
     with open(f'raport{nowformat}.txt', 'a') as f:
         f.write('<p style="color: #e65c00" style="font-weight: bold">Czyszczenie uszkodzonych kopii zakończone</p>' '</br>')
     f.close()
