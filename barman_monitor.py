@@ -24,7 +24,7 @@ def hashline():
 
 # Tworzymy, otwieramy i dodajemy datę do pliku raportowego, a następnie zamykamy go
 with open(f'raport{nowformat}.txt', 'a') as f:
-    f.write('<body style="background-color: #d7d9db; text-alignt: center" style="padding: 2%" style="margin: 0">')
+    f.write('<body style="background-color: #8b8b8c; text-alignt: center" style="padding: 2%" style="margin: 0">')
     f.write('<h1>RAPORT BARMAN DATASPACE WARSZAWA</h1>')
     f.write(f'<h2>DATA: {now} </h2>')
 
