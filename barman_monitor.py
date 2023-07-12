@@ -29,23 +29,6 @@ configs.remove('ssh-server.conf-template')
 configs.remove('passive-server.conf-template')
 configs.sort(reverse=True)
 
-#Wypisujemy dostępne konfiguracje
-#hashline()
-
-#with open(f'raport{nowformat}.txt', 'a') as f:
-#    f.write('<h3>' 'Konfiguracje dostępne na serwerze:' '</h3>')
-#f.close()
-
-#for i in configs:
-#    with open(f'raport{nowformat}.txt', 'a') as f:
-#        f.write(f'{i}' '</br>')
-#f.close()
-#
-#with open(f'raport{nowformat}.txt', 'a') as f:
-#        f.write('</br>')
-#f.close()
-
-
 hashline()
 
 #Tworzymy nową listę na bazie konfiguracji i usuwamy ostatnie 5 znaków z każdej pozycji (.conf)
@@ -117,35 +100,6 @@ if repair == 1:
         f.write('!Podjęto próbę automatycznej naprawy konfiguracji! </br>')
         f.write('</p>')
     f.close()
-
-
-#Wypisujemy wykonane dziś kopie dla każdej konfiguracji
-#hashline()
-
-#for i in backups:
-#    with open(f'raport{nowformat}.txt', 'a') as f:
-#        f.write('<span style="font-weight: bold">')
-#        f.write('</br>' f'Wykonane dziś kopie dla konfiguracji {i}:' '</br>')
-#        f.write('</span>')
-#    f.close()
-#    exist = None
-#    for file in sorted(os.listdir(directory+i+"/base")):
-#        if file.startswith(nowformat):
-#            with open(f'raport{nowformat}.txt', 'a') as f:
-#                f.write(f'{file}' '</br>')
-#            f.close()
-#            exist = i
-#    if exist == None:
-#        with open(f'raport{nowformat}.txt', 'a') as f:
-#            f.write('<span style="color: #b30000">')
-#            f.write(f'BRAK KOPII' '</br>')
-#            f.write('</span>')
-#        f.close()
-
-#Sprawdzamy wykonane dziś kopie i wypisujemy stan każdej z nich
-#with open(f'raport{nowformat}.txt', 'a') as f:
-#    f.write('</br>')
-#f.close()
 
 hashline()
 runclear = int(0)
