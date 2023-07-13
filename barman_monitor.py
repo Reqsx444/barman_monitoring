@@ -109,6 +109,7 @@ for i in backups:
         f.write('</span>')
 
     exist = None
+    backup_count = 0  # Licznik kopii dla danej konfiguracji
     for file in sorted(os.listdir(directory + i + "/base")):
         if file.startswith(nowformat):
             backupstate = os.system(f'barman check-backup {i} {file} >/dev/null 2>&1')
@@ -116,14 +117,13 @@ for i in backups:
             if backupstate == 0:
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('<span style="color: #248f24">')
-
+                backup_count += 1  # Zwiększenie licznika wykonanych kopii
                 os.system(f'echo "{file} jest poprawny </br>" >> raport{nowformat}.txt')
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('</span>')
             else:
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('<span style="color: #b30000">')
-
                 os.system(f'echo "{file} jest uszkodzony </br>" >> raport{nowformat}.txt')
                 with open(f'raport{nowformat}.txt', 'a') as f:
                     f.write('</span>')
@@ -134,6 +134,9 @@ for i in backups:
             f.write('<span style="color: #b54a55">')
             f.write(f'BRAK KOPII' '</br>')
             f.write('</span>')
+    else:
+        with open(f'raport{nowformat}.txt', 'a') as f:
+            f.write(f'Łącznie: {backup_count}' '</br>')
 
 # Uruchomienie skryptu do czyszczenia w przypadku wykrycia uszkodzonych kopii
 with open(f'raport{nowformat}.txt', 'a') as f:
