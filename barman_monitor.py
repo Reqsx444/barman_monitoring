@@ -5,9 +5,6 @@ import shutil
 import subprocess
 from airium import Airium
 
-# Importujemy potrzebne moduły
-from airium import Airium
-
 # Pobieramy dzisiejszą datę bez godziny i modyfikujemy jej format z YY-MM-DD na YYMMDD
 now = datetime.datetime.now().date()
 nowformat = now.strftime("%Y%m%d")
