@@ -22,7 +22,7 @@ def hashline():
 # Tworzymy, otwieramy i dodajemy datę do pliku raportowego, a następnie zamykamy go
 with open(f'raport{nowformat}.txt', 'a') as f:
     f.write('<body style="background-color: #d7d9db; text-alignt: center" style="padding: 2%" style="margin: 0">')
-    f.write('<h1>RAPORT BARMAN DATASPACE WARSZAWA</h1>')
+    f.write('<h1>RAPORT BARMAN Infracore WARSZAWA</h1>')
     f.write(f'<h2>DATA: {now} </h2>')
 
 # Pobieramy dostępne konfiguracje backupów Barman i usuwamy z listy template'y
@@ -162,8 +162,8 @@ with a.html(lang="pl"):
         a.meta(charset="utf-8")
         a.title(_t="Automatyczny Raport Barman 3S")
     with a.div():
-        a.img(src='https://wiki.dataspace.pl/wp-content/themes/starter-theme-master/img/data-space-logo.png',
-              alt='DataSpace Logo')
+        a.img(src='https://wiki.Infracore.pl/wp-content/themes/starter-theme-master/img/data-space-logo.png',
+              alt='Infracore Logo')
     with a.body():
         with a.h3(id="id23345225", kclass='main_header'):
             a(f'{converthtml}')
@@ -177,6 +177,6 @@ with open(f'raport{nowformat}.html', 'wb') as f:
 
 # Przesłanie raportu mailem
 os.system(
-    f'echo "W załączniku raport za dzień {now}" | mail -s "Automatyczny Raport Barman" damian.golal@dataspace.pl -A raport{nowformat}.html')
+    f'echo "W załączniku raport za dzień {now}" | mail -s "Automatyczny Raport Barman" damian.golal@Infracore.pl -A raport{nowformat}.html')
 shutil.move(f'raport{nowformat}.html', archive)
 os.remove(f'raport{nowformat}.txt')
