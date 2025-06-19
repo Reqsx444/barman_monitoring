@@ -21,10 +21,11 @@ Archiving and Cleanup: Archives the HTML report and deletes the original text re
 
 ## Example Usage
 To run the script, simply execute it with Python 3. For automated daily execution, it is recommended to add this script to your crontab.
-
+```
 python barman_backup_report.py
-
+```
 ## Adding to Crontab
 To ensure the script runs daily, add the following line to your crontab file:
-
+```
 0 2 * * * /usr/bin/python3 /path/to/barman_backup_report.py
+```
